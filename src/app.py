@@ -11,6 +11,10 @@ app.secret_key = 'supersecretkey'
 CORS(app)
 
 def get_random_wikipedia_page():
+    """
+    Fetches a random Wikipedia page title using the Wikipedia Random API.
+    Ensures that the page is a valid article (not a talk page, category, help page, etc.).
+    """
     url = "https://en.wikipedia.org/w/api.php"
     params = {
         "action": "query",
@@ -18,28 +22,40 @@ def get_random_wikipedia_page():
         "rnlimit": 1,
         "format": "json"
     }
-
     while True:
         response = requests.get(url, params=params)
         if response.status_code == 200:
             data = response.json()
             page_title = data['query']['random'][0]['title']
-
-            info_params = {
+            # Fetch metadata to check if it's an article (namespace 0)
+            page_info_url = "https://en.wikipedia.org/w/api.php"
+            page_info_params = {
                 "action": "query",
                 "titles": page_title,
                 "prop": "info",
                 "format": "json"
             }
-            info_response = requests.get(url, params=info_params)
-            if info_response.status_code == 200:
-                info = info_response.json()
-                page_id = list(info['query']['pages'].keys())[0]
-                namespace = info['query']['pages'][page_id].get('ns', None)
+
+            page_info_response = requests.get(
+                page_info_url, params=page_info_params)
+            if page_info_response.status_code == 200:
+                page_info = page_info_response.json()
+                page_id = list(page_info['query']['pages'].keys())[0]
+                namespace = page_info['query']['pages'][page_id].get(
+                    'ns', None)
+
+                # Check if the page is in the main namespace (namespace 0)
                 if namespace == 0:
                     return page_title
-        # fallback just in case
-        return "Special:Random"
+                else:
+                    print(
+                        f"Skipping non-article page: {page_title}. Retrying...")
+            else:
+                print(f"Error fetching metadata for {page_title}. Retrying...")
+        else:
+            print("Error fetching random Wikipedia page.")
+            return None
+
 
 def get_wikipedia_pageviews(article_title, days=30):
     end_date = datetime.today() - timedelta(days=1)
