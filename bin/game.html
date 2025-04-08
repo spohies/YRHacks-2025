@@ -57,6 +57,30 @@
       <p class="mb-4">
         ai summary???????????????????
       </p>
+      <p id="wikiSummary" class="mb-4">Loading summary...</p>
+
+<script>
+  function fetchWikipediaSummary(title) {
+    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`)
+      .then(response => response.json())
+      .then(data => {
+        const summaryEl = document.getElementById("wikiSummary");
+        if (data.extract) {
+          summaryEl.innerHTML = `${data.extract} <br><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(title)}" target="_blank" style="color: var(--solarized-cyan); text-decoration: underline;">Read more on Wikipedia</a>`;
+        } else {
+          summaryEl.textContent = "Summary not found.";
+        }
+      })
+      .catch(err => {
+        document.getElementById("wikiSummary").textContent = "Error fetching summary.";
+        console.error(err);
+      });
+  }
+
+  // Example usage:
+  fetchWikipediaSummary("Toilet paper orientation");
+</script>
+
       <p>click a link to go deeper:</p>
       <ul class="list-disc ml-6">
         <li><a href="#" onclick="goToArticle('page1')" style="color: var(--solarized-cyan);">page1</a></li>
