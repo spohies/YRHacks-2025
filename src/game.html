@@ -54,9 +54,16 @@
     <!-- Main Article Area -->
     <div class="w-full md:w-3/4 p-4 rounded-md shadow-md" style="background-color: var(--solarized-base); color: var(--solarized-text);">
       <h2 class="text-2xl font-bold mb-4" style="color: var(--solarized-blue);">testtest topic</h2>
-      <p class="mb-4">
-        ai summary???????????????????
-      </p>
+      <div class="w-full h-[100px]">
+        <iframe id="wikiFrame" src="https://en.wikipedia.org/wiki/Toilet_paper_orientation" 
+                class="w-full h-full border rounded-md" 
+                style="background-color: var(--solarized-base);"
+                loading="lazy">
+        </iframe>
+      </div>
+      <!-- <p id="wikiSummary" class="mb-4">Loading summary...</p> -->
+      
+
       <p>click a link to go deeper:</p>
       <ul class="list-disc ml-6">
         <li><a href="#" onclick="goToArticle('page1')" style="color: var(--solarized-cyan);">page1</a></li>
