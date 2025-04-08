@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Obscurity</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --solarized-base-bg: rgba(253, 246, 227, 1); /* slightly transparent */
+      --solarized-base: rgba(238, 232, 213, 0.85);
+      --solarized-text: #657b83;
+      --solarized-yellow: #b58900;
+      --solarized-orange: #cb4b16;
+      --solarized-red: #dc322f;
+      --solarized-magenta: #d33682;
+      --solarized-violet: #6c71c4;
+      --solarized-blue: #268bd2;
+      --solarized-cyan: #2aa198;
+      --solarized-green: #859900;
+    }
+    body {
+  position: relative;
+  color: var(--solarized-text);
+  background-color: var(--solarized-base-bg);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/src/background2.webp'); /* Update the path if needed */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.3; /* 30% opacity */
+  z-index: -1;
+}
+
+html, body {
+  height: 100%;
+}
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <div class="w-full p-4 flex justify-between items-center shadow-md" style="background-color: var(--solarized-blue); color: var(--solarized-base-bg);">
+    <h1 class="text-xl font-bold">Obscurity</h1>
+    <span id="articleTitle">Current Article: <strong>testtest</strong></span>
+  </div>
+
+  <!-- Layout -->
+  <div class="flex-grow flex flex-col md:flex-row p-4 gap-6">
+
+    <!-- Sidebar -->
+    <div class="w-full md:w-1/4 p-4 rounded-md shadow-md" style="background-color: var(--solarized-base); color: var(--solarized-text);">
+      <h2 class="text-lg font-semibold mb-2" style="color: var(--solarized-green);">weird meter</h2>
+      <div class="mb-4">
+        <div class="h-3 w-full bg-gray-300 rounded-full">
+          <div id="obscurityBar" class="h-full rounded-full" style="width: 40%; background-color: var(--solarized-magenta);"></div>
+        </div>
+        <p class="text-sm mt-1">Current Depth: <strong id="depthCount">0</strong></p>
+        <div id="visitedList" class="mt-4 text-xs"></div>
+      </div>
+      <button onclick="endGame()" class="w-full py-2 rounded-md font-semibold" style="background-color: var(--solarized-yellow); color: var(--solarized-base-bg);">
+        End Game
+      </button>
+    </div>
+
+<!-- Main Article Area -->
+<div class="w-full md:w-3/4 p-4 rounded-md shadow-md flex flex-col flex-grow min-h-0" style="background-color: var(--solarized-base); color: var(--solarized-text);">
+  <h2 class="text-2xl font-bold mb-4" style="color: var(--solarized-blue);">testtest topic</h2>
+  
+  <div class="flex-grow min-h-0">
+    <iframe id="wikiFrame" src="https://en.wikipedia.org/wiki/Toilet_paper_orientation" 
+            class="w-full h-full border rounded-md" 
+            style="background-color: var(--solarized-base);"
+            loading="lazy">
+    </iframe>
+  </div>
+
+  <p>click a link to go deeper:</p>
+  <ul id="linkList" class="list-disc ml-6"></ul>
+    <li><a href="#" onclick="goToArticle('Banana_slug')" style="color: var(--solarized-cyan);">Banana slug</a></li>
+    <li><a href="#" onclick="goToArticle('Quantum_fluctuation')" style="color: var(--solarized-cyan);">Quantum fluctuation</a></li>
+    <li><a href="#" onclick="goToArticle('List_of_unusual_articles')" style="color: var(--solarized-cyan);">List of unusual articles</a></li>
+  </ul>
+</div>
+
+
+  </div>
+
+  <script>
+    function endGame() {
+      alert("GAME OVER");
+      // add logic for determining obscure score and summarise number of clicks
+      // open the quiz function for the user to answer questions about the articles visited
+    }
+
+    function endGame() {
+    alert("GAME OVER");
+  }
+
+  async function goToArticle(articleTitle) {
+    const response = await fetch('/next', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: articleTitle })
+    });
+
+    const data = await response.json();
+    const displayName = data.title.replace(/_/g, ' ');
+
+    document.getElementById("articleTitle").innerHTML = `Current Article: <strong>${displayName}</strong>`;
+    document.getElementById("wikiFrame").src = `https://en.wikipedia.org/wiki/${data.title}`;
+
+    // Update the list of links
+    const ul = document.getElementById("linkList");
+    ul.innerHTML = "";
+    data.links.forEach(link => {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = "#";
+      a.innerText = link.replace(/_/g, ' ');
+      a.style.color = "var(--solarized-cyan)";
+      a.onclick = () => goToArticle(link);
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+
+    // Update visited list
+    const visitedDiv = document.getElementById("visitedList");
+    visitedDiv.innerHTML = "<strong>Visited:</strong><br>" + data.visited.map(v => `• ${v.replace(/_/g, ' ')}`).join("<br>");
+
+    // Update depth
+    document.getElementById("depthCount").innerText = data.clicks;
+  }
+  </script>
+</body>
+</html>
