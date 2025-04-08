@@ -8,7 +8,7 @@
   <style>
     :root {
       --solarized-base-bg: rgba(253, 246, 227, 1); 
-      --solarized-base: rgba(238, 232, 213, 0.9);
+      --solarized-base: rgba(238, 232, 213, 0.95);
       --solarized-text: #657b83;
       --solarized-yellow: #b58900;
       --solarized-orange: #cb4b16;
@@ -24,6 +24,11 @@
       color: var(--solarized-text);
       background-color: var(--solarized-base-bg);
       overflow-x: hidden;
+      background-image: url('/static/images/background2.webp');
+      background-size: auto;
+      background-repeat: repeat;
+      background-position: top center;
+      z-index: -1;
     }
 
     body::before {
@@ -33,12 +38,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: url('/static/images/background2.webp');
-      /* background-image: url("{{ url_for('static', filename='images/background2.webp') }}");  */
-      background-size: cover;
-      background-repeat: repeat;
-      background-position: center;
-      opacity: 0.3; 
+      background: transparent;
+      opacity: 0.3;
       z-index: -1;
     }
 
@@ -46,11 +47,10 @@
       height: 100%;
     }
 
-    /* Ensure iframe always fills its container correctly */
     .wiki-iframe-container {
       display: flex;
       flex-grow: 1;
-      height: 80vh;  /* Adjust as necessary */
+      height: 80vh;  
       overflow: hidden;
     }
 
@@ -61,101 +61,89 @@
     }
 
     .shadow-sm {
-  box-shadow: 0 1px 2px rgba(88, 110, 117, 0.1);
-}
+      box-shadow: 0 1px 2px rgba(88, 110, 117, 0.1);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col" data-start-title="{{ title }}">
 
   <!-- Header -->
-<div class="w-full px-6 py-3 flex items-center justify-between shadow-sm border-b"
-style="background-color: var(--solarized-base); color: var(--solarized-text); border-color: rgba(147, 161, 161, 0.2);">
-
-<div class="flex items-center space-x-3">
-<div class="w-3 h-3 rounded-full" style="background-color: var(--solarized-green);"></div>
-<h1 class="text-2xl font-bold tracking-tight" style="color: var(--solarized-blue);">Obscurity</h1>
-</div>
-
-<div class="text-sm md:text-base font-medium">
-<span style="color: var(--solarized-yellow);">Current Article:</span>
-<strong id="articleTitle" class="ml-1 text-sm md:text-base text-gray-700">Loading...</strong>
-</div>
-</div>
+  <div class="w-full px-6 py-3 flex items-center justify-between shadow-sm border-b"
+    style="background-color: var(--solarized-base); color: var(--solarized-text); border-color: rgba(147, 161, 161, 0.2);">
+    <div class="flex items-center space-x-3">
+      <div class="w-3 h-3 rounded-full" style="background-color: var(--solarized-green);"></div>
+      <h1 class="text-2xl font-bold tracking-tight" style="color: var(--solarized-blue);">Obscurity</h1>
+    </div>
+    <div class="text-sm md:text-base font-medium">
+      <span style="color: var(--solarized-yellow);">Current Article:</span>
+      <strong id="articleTitle" class="ml-1 text-sm md:text-base text-gray-700">Loading...</strong>
+    </div>
+  </div>
 
   <!-- Layout -->
   <div class="flex-grow flex flex-col md:flex-row p-4 gap-6">
 
-   <!-- Sidebar -->
-<div class="w-full md:w-1/4 p-4 rounded-md shadow-md" style="background-color: var(--solarized-base); color: var(--solarized-text);">
-  <h2 class="text-lg font-semibold mb-2" style="color: var(--solarized-green);">Weird Meter</h2>
-  <div class="mb-4">
-    <div class="h-3 w-full bg-gray-300 rounded-full">
-      <div id="obscurityBar" class="h-full rounded-full" style="width: 40%; background-color: var(--solarized-magenta);"></div>
+    <!-- Sidebar -->
+    <div class="w-full md:w-1/4 p-4 rounded-md shadow-md" style="background-color: var(--solarized-base); color: var(--solarized-text);">
+      <h2 class="text-lg font-semibold mb-2" style="color: var(--solarized-green);">Weird Meter</h2>
+      <div class="mb-4">
+        <div class="h-3 w-full bg-gray-300 rounded-full">
+          <div id="obscurityBar" class="h-full rounded-full" style="width: 40%; background-color: var(--solarized-magenta);"></div>
+        </div>
+        <p class="text-sm mt-1">Current Depth: <strong id="depthCount">0</strong></p>
+        <p class="text-xs text-gray-600 mt-1">Pageviews: <strong id="pageviewsCount">0</strong> last month</p>
+        <h3 class="mt-2 text-sm font-semibold">Previously Visited:</h3>
+        <ul id="visitedList" class="mt-2 text-xs list-disc pl-4"></ul>
+      </div>
+      <button onclick="endGame()" class="w-full py-2 rounded-md font-semibold" style="background-color: var(--solarized-yellow); color: var(--solarized-base-bg);">
+        End Game
+      </button>
     </div>
-    <p class="text-sm mt-1">Current Depth: <strong id="depthCount">0</strong></p>
-    <p class="text-xs text-gray-600 mt-1">Pageviews: <strong id="pageviewsCount">0</strong> last month</p>
-    <h3 class="mt-2 text-sm font-semibold">Previously Visited:</h3>
-    <ul id="visitedList" class="mt-2 text-xs list-disc pl-4">
-      <!-- Visited list will show up here -->
-    </ul>
-  </div>
-  <button onclick="endGame()" class="w-full py-2 rounded-md font-semibold" style="background-color: var(--solarized-yellow); color: var(--solarized-base-bg);">
-    End Game
-  </button>
-</div>
 
     <!-- Main Article Area -->
     <div class="w-full md:w-3/4 p-4 rounded-md shadow-md flex flex-col flex-grow min-h-0" style="background-color: var(--solarized-base); color: var(--solarized-text);">
       <h2 class="text-2xl font-bold mb-4" id="topicHeader" style="color: var(--solarized-blue);">Loading...</h2>
 
-      <!-- Wikipedia Iframe (Expanded) -->
       <div class="wiki-iframe-container mb-4">
-        <iframe id="wikiFrame" 
-                class="w-full h-full border rounded-md" 
-                style="background-color: var(--solarized-base);"
-                loading="lazy">
-        </iframe>
+        <iframe id="wikiFrame" class="w-full h-full border rounded-md" style="background-color: var(--solarized-base);" loading="lazy"></iframe>
       </div>
 
-      <!-- Link Options -->
       <p class="mb-2 font-semibold">Click a link to go deeper:</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 overflow-y-auto max-h-[250px] pr-2" id="linkContainer">
-        <!-- Links will be injected here -->
-      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 overflow-y-auto max-h-[250px] pr-2" id="linkContainer"></div>
     </div>
   </div>
 
   <script>
     function endGame() {
-  const weirdness = parseInt(document.getElementById("depthCount").innerText);
-  const clicks = clickCount;
-  const score = Math.max(0, Math.floor((weirdness * 100) / (clicks || 1)));
+      const totalWeirdness = visitedArticles.reduce((total, article) => total + article.weirdness, 0);
+      const clicks = clickCount;
+      const score = Math.max(0, Math.floor((totalWeirdness * 100) / (clicks || 1)));
 
-  document.getElementById("summaryWeirdness").innerText = weirdness;
-  document.getElementById("summaryClicks").innerText = clicks;
-  document.getElementById("summaryScore").innerText = score;
+      document.getElementById("summaryWeirdness").innerText = totalWeirdness;
+      document.getElementById("summaryClicks").innerText = clicks;
+      document.getElementById("summaryScore").innerText = score;
 
-  document.getElementById("summaryModal").classList.remove("hidden");
-}
+      document.getElementById("summaryModal").classList.remove("hidden");
+    }
 
-function closeSummary() {
-  document.getElementById("summaryModal").classList.add("hidden");
-}
+    function closeSummary() {
+      document.getElementById("summaryModal").classList.add("hidden");
+    }
 
-function startNewGame() {
-  location.reload();
-}
+    function startNewGame() {
+      location.reload();
+    }
 
-    let clickCount = 1;
+    let clickCount = 0;
     let visitedArticles = [];
 
     async function goToArticle(articleTitle) {
-      const displayName = articleTitle.replace(/_/g, ' ');
-      document.getElementById("articleTitle").innerHTML = `Current Article: <strong>${displayName}</strong>`;
+      const displayName = decodeURIComponent(articleTitle.replace(/_/g, ' '));
+      document.getElementById("articleTitle").innerHTML = displayName;
       document.getElementById("topicHeader").innerText = displayName;
       document.getElementById("wikiFrame").src = `https://en.wikipedia.org/wiki/${articleTitle}`;
 
-      visitedArticles.push(displayName);
+      visitedArticles.push({ title: displayName, weirdness: 0 });
       clickCount++;
 
       const res = await fetch(`/article_data?title=${encodeURIComponent(articleTitle)}`);
@@ -168,11 +156,12 @@ function startNewGame() {
 
     function renderLinks(links) {
       const container = document.getElementById("linkContainer");
-      container.innerHTML = ""; 
+      container.innerHTML = "";
       links.forEach(title => {
+        const decodedTitle = decodeURIComponent(title.replace(/_/g, " "));
         const link = document.createElement("a");
         link.href = "#";
-        link.innerText = title.replace(/_/g, " ");
+        link.innerText = decodedTitle;
         link.style.color = "var(--solarized-cyan)";
         link.onclick = () => {
           goToArticle(title);
@@ -184,53 +173,55 @@ function startNewGame() {
     }
 
     function updateWeirdMeter(views) {
-  const maxViews = 1000000;
-  const weirdness = Math.max(0, 100 - (views / maxViews) * 100); 
+  const minViews = 1;
+  const maxViews = 1000000; // anything above this is very common
+  const safeViews = Math.max(views, minViews); // prevent div by 0
+
+  // Invert + logarithmic scale for rarity
+  const inverted = maxViews / safeViews;
+  const weirdness = Math.min(100, (Math.log10(inverted) / Math.log10(maxViews)) * 100);
+
   const bar = document.getElementById("obscurityBar");
   bar.style.width = `${weirdness}%`;
   bar.title = `${views} views last month`;
+
+  document.getElementById("depthCount").innerText = Math.floor(weirdness);
   document.getElementById("pageviewsCount").innerText = views.toLocaleString();
+
+  visitedArticles[visitedArticles.length - 1].weirdness = weirdness;
 }
 
+
+    
 
     function updateVisitedList() {
       const list = document.getElementById("visitedList");
       list.innerHTML = "";
-      visitedArticles.forEach(title => {
+      visitedArticles.forEach(article => {
         const listItem = document.createElement("li");
-        listItem.textContent = title;
+        listItem.textContent = article.title;
         list.appendChild(listItem);
       });
     }
 
-    function updateWeirdMeter(views) {
-  const maxViews = 1000000;
-  const weirdness = Math.max(0, 100 - (views / maxViews) * 100); 
-  const bar = document.getElementById("obscurityBar");
-  bar.style.width = `${weirdness}%`;
-  bar.title = `${views} views last month`;
-  document.getElementById("depthCount").innerText = Math.floor(weirdness);
-  document.getElementById("pageviewsCount").innerText = views.toLocaleString();
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const startArticle = "{{ title | escape }}";
-    goToArticle(startArticle);
-  });
+    document.addEventListener("DOMContentLoaded", () => {
+      const startArticle = decodeURIComponent("{{ title | escape }}");
+      goToArticle(startArticle);
+    });
   </script>
 
   <!-- Game Summary Modal -->
-<div id="summaryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-  <div class="bg-white p-6 rounded-lg max-w-sm w-full text-center shadow-lg" style="background-color: var(--solarized-base); color: var(--solarized-text);">
-    <h2 class="text-xl font-bold mb-4">Game Summary</h2>
-    <p><strong>Max Weirdness:</strong> <span id="summaryWeirdness">0</span></p>
-    <p><strong>Total Clicks:</strong> <span id="summaryClicks">0</span></p>
-    <p><strong>Total Score:</strong> <span id="summaryScore">0</span></p>
-    <div class="mt-6 flex justify-between gap-4">
-      <button onclick="closeSummary()" class="flex-1 py-2 rounded-md font-semibold" style="background-color: var(--solarized-yellow); color: var(--solarized-base-bg);">Close</button>
-      <button onclick="startNewGame()" class="flex-1 py-2 rounded-md font-semibold" style="background-color: var(--solarized-blue); color: var(--solarized-base-bg);">New Game</button>
+  <div id="summaryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-lg max-w-sm w-full text-center shadow-lg" style="background-color: var(--solarized-base); color: var(--solarized-text);">
+      <h2 class="text-xl font-bold mb-4">Game Summary</h2>
+      <p><strong>Max Weirdness:</strong> <span id="summaryWeirdness">0</span></p>
+      <p><strong>Total Clicks:</strong> <span id="summaryClicks">0</span></p>
+      <p><strong>Total Score:</strong> <span id="summaryScore">0</span></p>
+      <div class="mt-6 flex justify-between gap-4">
+        <button onclick="closeSummary()" class="flex-1 py-2 rounded-md font-semibold" style="background-color: var(--solarized-yellow); color: var(--solarized-base-bg);">Close</button>
+        <button onclick="startNewGame()" class="flex-1 py-2 rounded-md font-semibold" style="background-color: var(--solarized-blue); color: var(--solarized-base-bg);">New Game</button>
+      </div>
     </div>
   </div>
-</div>
 </body>
 </html>
