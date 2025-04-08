@@ -36,7 +36,7 @@
       background-image: url('/static/images/background2.webp');
       /* background-image: url("{{ url_for('static', filename='images/background2.webp') }}");  */
       background-size: cover;
-      background-repeat: no-repeat;
+      background-repeat: repeat;
       background-position: center;
       opacity: 0.3; 
       z-index: -1;
@@ -61,7 +61,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col" data-start-title="{{ title }}">
 
   <!-- Header -->
   <div class="w-full p-4 flex justify-between items-center shadow-md" style="background-color: var(--solarized-blue); color: var(--solarized-base-bg);">
@@ -72,23 +72,24 @@
   <!-- Layout -->
   <div class="flex-grow flex flex-col md:flex-row p-4 gap-6">
 
-    <!-- Sidebar -->
-    <div class="w-full md:w-1/4 p-4 rounded-md shadow-md" style="background-color: var(--solarized-base); color: var(--solarized-text);">
-      <h2 class="text-lg font-semibold mb-2" style="color: var(--solarized-green);">Weird Meter</h2>
-      <div class="mb-4">
-        <div class="h-3 w-full bg-gray-300 rounded-full">
-          <div id="obscurityBar" class="h-full rounded-full" style="width: 40%; background-color: var(--solarized-magenta);"></div>
-        </div>
-        <p class="text-sm mt-1">Current Depth: <strong id="depthCount">0</strong></p>
-        <h3 class="mt-2 text-sm font-semibold">Previously Visited:</h3>
-        <ul id="visitedList" class="mt-2 text-xs list-disc pl-4">
-          <!-- Visited list will show up here -->
-        </ul>
-      </div>
-      <button onclick="endGame()" class="w-full py-2 rounded-md font-semibold" style="background-color: var(--solarized-yellow); color: var(--solarized-base-bg);">
-        End Game
-      </button>
+   <!-- Sidebar -->
+<div class="w-full md:w-1/4 p-4 rounded-md shadow-md" style="background-color: var(--solarized-base); color: var(--solarized-text);">
+  <h2 class="text-lg font-semibold mb-2" style="color: var(--solarized-green);">Weird Meter</h2>
+  <div class="mb-4">
+    <div class="h-3 w-full bg-gray-300 rounded-full">
+      <div id="obscurityBar" class="h-full rounded-full" style="width: 40%; background-color: var(--solarized-magenta);"></div>
     </div>
+    <p class="text-sm mt-1">Current Depth: <strong id="depthCount">0</strong></p>
+    <p class="text-xs text-gray-600 mt-1">Pageviews: <strong id="pageviewsCount">0</strong> last month</p>
+    <h3 class="mt-2 text-sm font-semibold">Previously Visited:</h3>
+    <ul id="visitedList" class="mt-2 text-xs list-disc pl-4">
+      <!-- Visited list will show up here -->
+    </ul>
+  </div>
+  <button onclick="endGame()" class="w-full py-2 rounded-md font-semibold" style="background-color: var(--solarized-yellow); color: var(--solarized-base-bg);">
+    End Game
+  </button>
+</div>
 
     <!-- Main Article Area -->
     <div class="w-full md:w-3/4 p-4 rounded-md shadow-md flex flex-col flex-grow min-h-0" style="background-color: var(--solarized-base); color: var(--solarized-text);">
@@ -96,7 +97,7 @@
 
       <!-- Wikipedia Iframe (Expanded) -->
       <div class="wiki-iframe-container mb-4">
-        <iframe id="wikiFrame" src="" 
+        <iframe id="wikiFrame" 
                 class="w-full h-full border rounded-md" 
                 style="background-color: var(--solarized-base);"
                 loading="lazy">
@@ -172,9 +173,20 @@
       });
     }
 
-    window.onload = () => {
-      goToArticle("Special:Random"); 
-    };
+    function updateWeirdMeter(views) {
+  const maxViews = 1000000;
+  const weirdness = Math.max(0, 100 - (views / maxViews) * 100); 
+  const bar = document.getElementById("obscurityBar");
+  bar.style.width = `${weirdness}%`;
+  bar.title = `${views} views last month`;
+  document.getElementById("depthCount").innerText = Math.floor(weirdness);
+  document.getElementById("pageviewsCount").innerText = views.toLocaleString();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const startArticle = "{{ title | escape }}";
+    goToArticle(startArticle);
+  });
   </script>
 </body>
 </html>

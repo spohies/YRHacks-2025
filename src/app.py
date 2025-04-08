@@ -38,6 +38,7 @@ def get_random_wikipedia_page():
                 namespace = info['query']['pages'][page_id].get('ns', None)
                 if namespace == 0:
                     return page_title
+        # fallback just in case
         return "Special:Random"
 
 def get_wikipedia_pageviews(article_title, days=30):
@@ -85,7 +86,7 @@ def index():
     start_article = get_random_wikipedia_page()
     session['visited'].append(start_article)
 
-    return render_template('game.html', title=start_article)
+    return render_template('game.html', title=start_article)  # ✅ title passed to template
 
 @app.route('/article_data')
 def article_data():
